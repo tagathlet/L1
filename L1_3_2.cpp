@@ -15,17 +15,15 @@ int main()
     while (x) {
         printf("Enter a natural number (0 to end): ");
         fgets(line, sizeof(line), stdin);
+        correct = 1;
         for (int i = 0; i < sizeof(line); i++) {
-            if (line[i] >= '0' && line[i] <= '9') {
-                correct = 1;
-            }
-            else if (line[i] == '\n') {
+            if (line[i] == '\n') {
                 if (i == 0) {
                     correct = 0;
                 }
                 break;
             }
-            else {
+            else if (line[i] < '0' || line[i] > '9') {
                 correct = 0;
                 break;
             }
@@ -57,3 +55,4 @@ int main()
     printf("\nMax number index: %d", max_N + 1);
 
     return 0;
+}
