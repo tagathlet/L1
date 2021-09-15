@@ -26,8 +26,8 @@ int get_word_end(int i, char* string) {
 	}
 }
 
-bool check_next_word(int i) {
-	if (i == -1) {
+bool check_next_word(int i, char* string) {
+	if (get_word_start(i, string) == -1) {
 		return false;
 	}
 	else {
@@ -35,25 +35,26 @@ bool check_next_word(int i) {
 	}
 }
 
-bool check_empty_string(char* string) {
-	int start = get_word_start(0, string);
-	if (check_next_word(start)) {
-		return true;
-	}
-	else {
-		return false;
-	}
-}
 
 bool check_symmetrical(int first, int last, char *word) {
-	int centre = (last - first) / 2 + first;
-	int end = last + first;
-	for (int i = first; i < centre; i++) {
-		if (word[i] != word[end - i]) {
+	if (last - first == 1) {
+		if (word[first] == word[last]) {
+			return true;
+		}
+		else {
 			return false;
 		}
 	}
-	return true;
+	else {
+		int centre = (last - first) / 2 + first;
+		int end = last + first;
+		for (int i = first; i < centre; i++) {
+			if (word[i] != word[end - i]) {
+				return false;
+			}
+		}
+		return true;
+	}
 }
 
 void print_word(int i, int last, char *string) {
@@ -67,6 +68,7 @@ void print_word(int i, int last, char *string) {
 int main() {
 	
 	char string[BUF_SIZE] = {};
+	int i = 0;
 	int start = 0;
 	int end = 0;
 	bool next_word = true;
@@ -76,8 +78,7 @@ int main() {
 	fgets(string, sizeof(string), stdin);
 	printf("Symmetrical words: ");
 
-	
-	next_word = check_empty_string(string);
+	next_word = check_next_word(0, string);
 
 	while (next_word) {
 		start = get_word_start(start, string);
@@ -86,8 +87,8 @@ int main() {
 			not_found = false;
 			print_word(start, end, string);
 		}
-		start = get_word_start(end + 1, string);
-		next_word = check_next_word(start);
+		start = end + 1;
+		next_word = check_next_word(start, string);
 	}
 
 	if (not_found) {
