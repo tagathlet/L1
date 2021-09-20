@@ -1,5 +1,5 @@
 ﻿#include <stdio.h>
-#include <Windows.h>
+#include <string.h>
 
 #define STRING_SIZE 255
 
@@ -29,13 +29,7 @@ int get_word_end(int i, char* string) {
 }
 
 bool is_vowels(char c) {
-	if (c == 'а' || c == 'е' || c == 'и' || c == 'о' || c == 'у' || c == 'ы' || c == 'э' || c == 'ю' || c == 'я' || c == 'ё' || \
-		c == 'А' || c == 'Е' || c == 'И' || c == 'О' || c == 'У' || c == 'Ы' || c == 'Э' || c == 'Ю' || c == 'Я' || c == 'Ё') {
-		return true;
-	}
-	else {
-		return false;
-	}
+	return strchr("aeiouyAEIOUY", c) != NULL;
 }
 
 int number_of_vowels(int start, int end, char* string) {
@@ -55,23 +49,69 @@ void print_word(int start, int end, char* string) {
 	putc(' ', stdout);
 }
 
+struct word_struct {
+	int vowels;
+	int start;
+	int end;
+};
+
+void bubble_sort(word_struct* word, int n) {
+	struct word_struct tmp;
+	bool swap = false;
+	for (int i = 1; i < n; i++) {
+		swap = false;
+		for (int j = 1; j < n; j++) {
+			if (word[j].vowels < word[j - 1].vowels) {
+				tmp = word[j];
+				word[j] = word[j - 1];
+				word[j - 1] = tmp;
+				swap = true;
+			}
+		}
+		if (!swap) {
+			break;
+		}
+	}
+}
+
+void insertion_sort(word_struct* word, int n) {
+	struct word_struct tmp;
+	for (int i = 1; i < n; i++) {
+		for (int j = i; j > 0; j--) {
+			if (word[j].vowels > word[j - 1].vowels) {
+				tmp = word[j];
+				word[j] = word[j - 1];
+				word[j - 1] = tmp;
+				continue;
+			}
+		}
+	}
+}
+
+void selection_sort(word_struct* word, int n) {
+	struct word_struct tmp;
+	for (int i = 0; i < n - 1; i++) {
+		int min = i;
+		for (int j = i + 1; j < n; j++) {
+			if (word[j].vowels < word[min].vowels) {
+				min = j;
+			}
+		}
+		if (min != i) {
+			tmp = word[i];
+			word[i] = word[min];
+			word[min] = tmp;
+		}
+	}
+}
+
 int main() {
 
+	struct word_struct word[STRING_SIZE / 2] = { 0 };
 	char string[STRING_SIZE] = {};
-	int result[STRING_SIZE / 2 * 3] = {0};
-	int result_index = 0;
 	int start = 0;
 	int end = 0;
-	int n = 0;
-	int max_vowels = 0;
-	int j = 0;
-
-	for (int i = 0; i < STRING_SIZE / 2 * 3; i++) {
-		result[i] = -1;
-	}
-
-	SetConsoleCP(1251);
-	SetConsoleOutputCP(1251);
+	int count_word = 0;
 
 	printf("Input string: ");
 	fgets(string, sizeof(string), stdin);
@@ -82,25 +122,16 @@ int main() {
 			break;
 		}
 		end = get_word_end(start, string);
-		n = number_of_vowels(start, end, string);
-		if (n > max_vowels) {
-			max_vowels = n;
-		}
-		result[result_index] = n;
-		result[result_index + 1] = start;
-		result[result_index + 2] = end;
-		result_index += 3;
+		word[count_word].vowels = number_of_vowels(start, end, string);
+		word[count_word].start = start;
+		word[count_word].end = end;
+		count_word++;
 		start = end + 1;
 	}
 
-	for (int i = 0; i <= max_vowels; i++) {
-		j = 0;
-		while (result[j] != -1) {
-			if (result[j] == i) {
-				print_word(result[j + 1], result[j + 2], string);
-			}
-			j += 3;
-		}
+	selection_sort(word, count_word);
+	for (int i = 0; i < count_word; i++) {
+		print_word(word[i].start, word[i].end, string);
 	}
 
 	return 0;
